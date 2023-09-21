@@ -9,23 +9,23 @@ def get_days(date1, date2):
     
     # get total days in date1
     # days in years1
-    total_days_date1 = get_year_days(year1)
+    total_days_date1 = get_year_days(int(year1))
 
     # days in month1
-    total_days_date1 += get_month_days(month1, year1)
+    total_days_date1 += get_month_days(int(month1), int(year1))
 
     # total_days added to day1
-    total_days_date1 += day1
+    total_days_date1 += int(day1)
 
     #get total days in date2
     # days in years2
-    total_days_date2 = get_year_days(year2)
+    total_days_date2 = get_year_days(int(year2))
 
     # days in month2
-    total_days_date2 += get_month_days(month2, year2)
+    total_days_date2 += get_month_days(int(month2), int(year2))
 
     # total_days added to day2
-    total_days_date2 += day2
+    total_days_date2 += int(day2)
 
     # get difference in days
     no_of_days = total_days_date1 - total_days_date2
@@ -45,7 +45,7 @@ def get_month_days(month, year):
     months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     total_days = 0
-    for i in range(months[month]+1):
+    for i in range(months[month-1]):
         total_days += days[i]
     if(year%4 == 0 and month >= 2):
         total_days += 1
