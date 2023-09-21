@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from CalculateDays.dayCalculator import get_days
 
 # instantiate the app
 app = Flask(__name__)
@@ -124,6 +125,42 @@ def delete_member():
             members.remove(member)
             return jsonify({'message': 'Member has been deleted successfully!'})
     return jsonify({'message': 'No such member exists!'})
+
+# issue book
+@app.route('/issue', methods=['POST'])
+def issue():
+    for member in members:
+        if(member['member_id']==request.form['member_id']):
+            for book in books:
+                if(book['isbn']==request.form['isbn']):
+                    bookAssign.append({
+                        'isbn': request.form['isbn'], 
+                        'member_id': request.form['member_id'], 
+                        'date': request.form['date']
+                    })
+                    for bookreturn in bookReturn:
+                        if(bookreturn['isbn']==request.form['isbn'] and 
+                           bookreturn['member_id']==request.form['member_id']):
+                            bookReturn.remove(bookreturn)
+                    return jsonify({'message': 'Book assigned successfully!'})
+    return jsonify({'message': 'No such details were found!'})
+
+# issue book return
+@app.route('/returnbook', methods=['POST'])
+def returnbook():
+    for bookassign in bookAssign:
+        if(bookassign['isbn']==request.form['isbn'] and bookassign['member_id']==request.form['member_id']):
+            days, fee = get_days(request.form['date'], bookassign['date'])
+            bookReturn.append({
+                'isbn': bookassign['isbn'],
+                'member_id': bookassign['member_id'],
+                'date': bookassign['date'],
+                'days': days,
+                'fee': fee
+            })
+            bookAssign.remove(bookassign)
+            return jsonify({'message': 'Book return was issued!'})
+    return jsonify({'message': 'No such details were found!'})
 
 if __name__ == '__main__':
     app.run()
