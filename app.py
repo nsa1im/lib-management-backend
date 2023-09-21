@@ -26,6 +26,7 @@ bookReturn = [
     {'isbn': 9780202366395, 'member_id': 19834, 'date': '2023-08-01', 'days': 60, 'fee': 300}
 ]
 
+# BOOKS
 # create book
 @app.route('/addbook', methods=['POST'])
 def add_book():
@@ -35,7 +36,7 @@ def add_book():
     book_quantity = request.form['quantity']
     for book in books:
         if book['isbn']==book_isbn:
-            return jsonify({'message': 'Book exists!'})
+            return jsonify({'message': 'Book already exists!'})
     book = {
         'book_title': book_title,
         'book_author': book_author,
@@ -43,7 +44,7 @@ def add_book():
         'quantity': book_quantity
     }
     return jsonify({'message': 'Book has been added successfully!'})
-# BOOKS
+
 # view all books
 @app.route('/allbooks', methods=['GET'])
 def get_books():
@@ -76,6 +77,22 @@ def delete_book():
     return jsonify({'message': 'No such book exists!'})
 
 # MEMBERS
+# create member
+@app.route('/addmember', methods=['POST'])
+def add_member():
+    member_id = request.form['member_id']
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    for member in members:
+        if member['member_id']==member_id:
+            return jsonify({'message': 'Member already exists!'})
+    member = {
+        'member_id': member_id,
+        'first_name': first_name,
+        'last_name': last_name
+        }
+    return jsonify({'message': 'Member has been added successfully!'})
+
 # view all members
 @app.route('/allmembers', methods=['GET'])
 def get_members():
@@ -93,7 +110,7 @@ def get_member(name):
 @app.route('/updatemember', methods=['PUT'])
 def update_member():
     for member in members:
-        if(member['id']==request.form['id']):
+        if(member['member_id']==request.form['member_id']):
             member['first_name']=request.form['first_name']
             member['last_name']=request.form['last_name']
             return jsonify({'message': 'Member has been updated successfully!'})
@@ -103,7 +120,7 @@ def update_member():
 @app.route('/deletemember', methods=['DELETE'])
 def delete_member():
     for member in members:
-        if(member['id']==request.form['id']):
+        if(member['member_id']==request.form['member_id']):
             members.remove(member)
             return jsonify({'message': 'Member has been deleted successfully!'})
     return jsonify({'message': 'No such member exists!'})
