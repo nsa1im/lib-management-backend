@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 # instantiate the app
@@ -25,6 +25,55 @@ bookAssign = [
 bookReturn = [
     {'isbn': 9780202366395, 'member_id': 19834, 'date': '2023-08-01', 'days': 60, 'fee': 300}
 ]
+
+# create book
+@app.route('/addbook', methods=['POST'])
+def add_book():
+    book_title = request.form['title']
+    book_author = request.form['author']
+    book_isbn = request.form['isbn']
+    book_quantity = request.form['quantity']
+    for book in books:
+        if book['isbn']==book_isbn:
+            return jsonify({'message': 'Book exists!'})
+    book = {
+        'book_title': book_title,
+        'book_author': book_author,
+        'isbn': book_isbn,
+        'quantity': book_quantity
+    }
+    return jsonify({'message': 'Book has been added successfully!'})
+
+# view all books
+@app.route('/allbooks', methods=['GET'])
+def get_books():
+    return jsonify(books)
+
+# view a book based on author or title
+@app.route('/getbook/<string:author_title>', methods=['GET'])
+def get_book(author_title):
+    for book in books:
+        if(book['book_title']==author_title or book['book_author']==author_title):
+            return jsonify(book)
+    return jsonify({'message': 'No such book exists!'})
+
+# update book
+@app.route('/updatebook', methods=['PUT'])
+def update_book():
+    for book in books:
+        if(book['isbn']==request.form['isbn']):
+            book['quantity']=request.form['quantity']
+            return jsonify({'message': 'Book has been updated successfully!'})
+    return jsonify({'message': 'No such book exists!'})
+
+# delete book 
+@app.route('/deletebook', methods=['DELETE'])
+def delete_book():
+    for book in books:
+        if(book['isbn']==request.form['isbn']):
+            books.remove(book)
+            return jsonify({'message': 'Book has been deleted successfully!'})
+    return jsonify({'message': 'No such book exists!'})
 
 if __name__ == '__main__':
     app.run()
