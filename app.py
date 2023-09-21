@@ -43,7 +43,7 @@ def add_book():
         'quantity': book_quantity
     }
     return jsonify({'message': 'Book has been added successfully!'})
-
+# BOOKS
 # view all books
 @app.route('/allbooks', methods=['GET'])
 def get_books():
@@ -74,6 +74,39 @@ def delete_book():
             books.remove(book)
             return jsonify({'message': 'Book has been deleted successfully!'})
     return jsonify({'message': 'No such book exists!'})
+
+# MEMBERS
+# view all members
+@app.route('/allmembers', methods=['GET'])
+def get_members():
+    return jsonify(members)
+
+# view a member based on name
+@app.route('/getmember/<string:name>', methods=['GET'])
+def get_member(name):
+    for member in members:
+        if(member['first_name']==name or member['last_name']==name):
+            return jsonify(member)
+    return jsonify({'message': 'No such member exists!'})
+
+# update member
+@app.route('/updatemember', methods=['PUT'])
+def update_member():
+    for member in members:
+        if(member['id']==request.form['id']):
+            member['first_name']=request.form['first_name']
+            member['last_name']=request.form['last_name']
+            return jsonify({'message': 'Member has been updated successfully!'})
+    return jsonify({'message': 'No such member exists!'})
+
+# delete member 
+@app.route('/deletemember', methods=['DELETE'])
+def delete_member():
+    for member in members:
+        if(member['id']==request.form['id']):
+            members.remove(member)
+            return jsonify({'message': 'Member has been deleted successfully!'})
+    return jsonify({'message': 'No such member exists!'})
 
 if __name__ == '__main__':
     app.run()
