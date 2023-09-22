@@ -21,11 +21,16 @@ INSERT_RETURN = "INSERT INTO bookReturn (isbn, member_id, date, days, fee) VALUE
 # view from tables
 GET_ALL_BOOKS = "SELECT * FROM books;"
 GET_BOOK = "SELECT * FROM books WHERE isbn = (%s);"
-GET_BOOK_AUTHOR = "SELECT * FROM books WHERE book_author = (%s);"
-GET_BOOK_TITLE = "SELECT * FROM books WHERE book_title = (%s);"
+GET_BOOK_AUTHOR_TITLE = "SELECT * FROM books WHERE book_author=(%s) or book_title=(%s)"
+
+GET_ALL_MEMBERS = "SELECT * FROM members;"
+GET_MEMBER = "SELECT * FROM members WHERE member_id=(%s)"
+GET_NAME = "SELECT FROM members WHERE first_name=(%s) or last_name=(%s)"
 
 # update tables
 UPDATE_BOOK = "UPDATE books SET quantity=(%s) WHERE isbn=(%s);"
+UPDATE_MEMBER = "UPDATE members SET first_name=(%s), last_name=(%s) WHERE member_id=(%s);"
 
 # delete from tables
 DELETE_BOOK = "DELETE FROM books WHERE isbn=(%s);"
+DELETE_MEMBER = "DELETE FROM members WHERE member_id=(%s);"

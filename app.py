@@ -51,15 +51,8 @@ def get_book():
     books = []
     with connection:
         with connection.cursor() as cursor:
-            cursor.execute(GET_BOOK_TITLE, (book_title, ))
-            books1 = cursor.fetchall()
-            cursor.execute(GET_BOOK_AUTHOR, (book_author, ))
-            books2 = cursor.fetchall()
-            if(books1 == books2):
-                books.append(books1)
-            else:
-                books.append(books1)
-                books.append(books2)
+            cursor.execute(GET_BOOK_AUTHOR_TITLE, (book_author, book_title))
+            books.append(cursor.fetchall())
             if(books==[[]]):
                 return jsonify({'message': 'No such book exists!'})
             return jsonify(books)
@@ -98,47 +91,64 @@ def add_member():
     member_id = request.form['member_id']
     first_name = request.form['first_name']
     last_name = request.form['last_name']
-    for member in members:
-        if member['member_id']==member_id:
-            return jsonify({'message': 'Member already exists!'})
-    member = {
-        'member_id': member_id,
-        'first_name': first_name,
-        'last_name': last_name
-        }
-    return jsonify({'message': 'Member has been added successfully!'})
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(CREATE_MEMBERS_TABLE)
+            cursor.execute(GET_MEMBER, (member_id, ))
+            if(cursor.fetchall()==[]):
+                cursor.execute(INSERT_MEMBER, (member_id, first_name, last_name))
+                return jsonify({'message': 'Member has been added successfully!'})
+    return jsonify({'message': 'Member already exists!'})
 
 # view all members
 @app.route('/allmembers', methods=['GET'])
 def get_members():
-    return jsonify(members)
+     with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ALL_MEMBERS)
+            members = cursor.fetchall()
+            return jsonify(members)
 
 # view a member based on name
-@app.route('/getmember/<string:name>', methods=['GET'])
-def get_member(name):
-    for member in members:
-        if(member['first_name']==name or member['last_name']==name):
-            return jsonify(member)
-    return jsonify({'message': 'No such member exists!'})
+@app.route('/getmember', methods=['GET'])
+def get_member():
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    members = []
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_NAME, (first_name, last_name))
+            members.append(cursor.fetchall())
+            if(members==[[]]):
+                return jsonify({'message': 'No such member exists!'})
+            return jsonify(members)
 
 # update member
 @app.route('/updatemember', methods=['PUT'])
 def update_member():
-    for member in members:
-        if(member['member_id']==request.form['member_id']):
-            member['first_name']=request.form['first_name']
-            member['last_name']=request.form['last_name']
+    member_id = request.form['member_id']
+    first_name =request.form['first_name']
+    last_name =request.form['last_name']
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_MEMBER, (member_id, ))
+            if(cursor.fetchall()==[]):
+                return jsonify({'message': 'No such member exists!'})
+            cursor.execute(UPDATE_MEMBER, (first_name, last_name, member_id))
             return jsonify({'message': 'Member has been updated successfully!'})
-    return jsonify({'message': 'No such member exists!'})
 
 # delete member 
 @app.route('/deletemember', methods=['DELETE'])
 def delete_member():
-    for member in members:
-        if(member['member_id']==request.form['member_id']):
-            members.remove(member)
-            return jsonify({'message': 'Member has been deleted successfully!'})
-    return jsonify({'message': 'No such member exists!'})
+    member_id = request.form['member_id']
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_MEMBER, (member_id, ))
+            if(cursor.fetchall()==[]):
+                return jsonify({'message': 'No such member exists!'})
+            else:
+                cursor.execute(DELETE_MEMBER, (member_id, ))
+                return jsonify({'message': 'Member has been deleted successfully!'})
 
 # issue book
 @app.route('/issue', methods=['POST'])
