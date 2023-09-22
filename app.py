@@ -153,38 +153,44 @@ def delete_member():
 # issue book
 @app.route('/issue', methods=['POST'])
 def issue():
-    for member in members:
-        if(member['member_id']==request.form['member_id']):
-            for book in books:
-                if(book['isbn']==request.form['isbn']):
-                    bookAssign.append({
-                        'isbn': request.form['isbn'], 
-                        'member_id': request.form['member_id'], 
-                        'date': request.form['date']
-                    })
-                    for bookreturn in bookReturn:
-                        if(bookreturn['isbn']==request.form['isbn'] and 
-                           bookreturn['member_id']==request.form['member_id']):
-                            bookReturn.remove(bookreturn)
-                    return jsonify({'message': 'Book assigned successfully!'})
-    return jsonify({'message': 'No such details were found!'})
-
+    member_id = request.form['member_id']
+    isbn = request.form['isbn']
+    date = request.form['date']
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_MEMBER, (member_id, ))
+            if(cursor.fetchall()==[]):
+                return jsonify({'message': 'No such member was found!'})
+            else:
+                cursor.execute(GET_BOOK, (isbn, ))
+                if(cursor.fetchall()==[]):
+                    return jsonify({'message': 'No such book was found!'})
+                else:
+                    cursor.execute(GET_ASSIGN, (isbn, member_id))
+                    if(cursor.fetchall()==[]):
+                        cursor.execute(INSERT_ASSIGN, (isbn, member_id, date))
+                        cursor.execute(DELETE_RETURN, (isbn, member_id))
+                        return jsonify({'message': 'Book issued successfully!'})
+                    else:
+                        return jsonify({'message': 'Book has already been issued!'})
+                    
 # issue book return
 @app.route('/returnbook', methods=['POST'])
 def returnbook():
-    for bookassign in bookAssign:
-        if(bookassign['isbn']==request.form['isbn'] and bookassign['member_id']==request.form['member_id']):
-            days, fee = get_days(request.form['date'], bookassign['date'])
-            bookReturn.append({
-                'isbn': bookassign['isbn'],
-                'member_id': bookassign['member_id'],
-                'date': bookassign['date'],
-                'days': days,
-                'fee': fee
-            })
-            bookAssign.remove(bookassign)
-            return jsonify({'message': 'Book return was issued!'})
-    return jsonify({'message': 'No such details were found!'})
+    isbn = request.form['isbn']
+    member_id = request.form['member_id']
+    date = request.form['date']
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ASSIGN, (isbn, member_id))
+            if(cursor.fetchall()==[]):
+                return jsonify({'message': 'No such issue was found!'})
+            else:
+                prev_date = cursor.fetchall()[0][2]
+                days, fee = get_days(date, prev_date)
+                cursor.execute(INSERT_RETURN, (isbn, member_id, date, days, fee))
+                cursor.execute(DELETE_ASSIGN, (isbn, member_id))
+                return jsonify({'message': 'Book return was issued!'})
 
 if __name__ == '__main__':
     app.run()
