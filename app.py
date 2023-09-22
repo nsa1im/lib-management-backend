@@ -1,63 +1,69 @@
+import os
+import psycopg2
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from CalculateDays.dayCalculator import get_days
+from dbHelper.dbHelper import *
+
+load_dotenv()
 
 # instantiate the app
 app = Flask(__name__)
 app.config.from_object(__name__)
+url = os.getenv("DATABASE_URL")
+connection = psycopg2.connect(url)
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
-
-# sample data
-books = [
-    {'book_title': 'A Historical Geography of China', 'book_author': 'Yi-Fu Tuan', 'isbn': 9780202366395, 'quantity': 200},
-    {'book_title': 'A Guide to High-performance Powder Coating', 'book_author': 'Bob Utech', 'isbn': 9780872635470, 'quantity': 20},
-    {'book_title': 'Mobile Multimedia in Action', 'book_author': 'Ilpo Koskinen', 'isbn': 9781412809429, 'quantity': 100}
-]
-members = [
-    {'member_id': 19834, 'first_name': 'Ahmed', 'last_name': 'Ali'},
-    {'member_id': 19221, 'first_name': 'Muhammad', 'last_name': 'Yusuf'},
-    {'member_id': 20385, 'first_name': 'Kamau', 'last_name': 'Peter'}
-]
-bookAssign = [
-    {'isbn': 9780202366395, 'member_id': 19834, 'date': '2023-06-02'}
-]
-bookReturn = [
-    {'isbn': 9780202366395, 'member_id': 19834, 'date': '2023-08-01', 'days': 60, 'fee': 300}
-]
 
 # BOOKS
 # create book
 @app.route('/addbook', methods=['POST'])
 def add_book():
     book_title = request.form['title']
-    book_author = request.form['author']
+    book_author = request.form['author'] 
     book_isbn = request.form['isbn']
     book_quantity = request.form['quantity']
-    for book in books:
-        if book['isbn']==book_isbn:
-            return jsonify({'message': 'Book already exists!'})
-    book = {
-        'book_title': book_title,
-        'book_author': book_author,
-        'isbn': book_isbn,
-        'quantity': book_quantity
-    }
-    return jsonify({'message': 'Book has been added successfully!'})
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(CREATE_BOOKS_TABLE)
+            cursor.execute(GET_BOOK, (book_isbn, ))
+            if(cursor.fetchall()==[]):
+                cursor.execute(INSERT_BOOK, (book_title, book_author, book_isbn, book_quantity))
+                return jsonify({'message': 'Book has been added successfully!'})
+    return jsonify({'message': 'Book already exists!'})
 
 # view all books
 @app.route('/allbooks', methods=['GET'])
 def get_books():
-    return jsonify(books)
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ALL_BOOKS)
+            books = cursor.fetchall()
+            return jsonify(books)
 
 # view a book based on author or title
-@app.route('/getbook/<string:author_title>', methods=['GET'])
-def get_book(author_title):
-    for book in books:
-        if(book['book_title']==author_title or book['book_author']==author_title):
-            return jsonify(book)
-    return jsonify({'message': 'No such book exists!'})
+@app.route('/getbook', methods=['GET'])
+def get_book():
+    book_author = request.form['author']
+    book_title = request.form['title']
+    books = []
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_BOOK_TITLE, (book_title, ))
+            books1 = cursor.fetchall()
+            cursor.execute(GET_BOOK_AUTHOR, (book_author, ))
+            books2 = cursor.fetchall()
+            if(books1 == books2):
+                books.append(books1)
+            else:
+                books.append(books1)
+                books.append(books2)
+            if(books==[[]]):
+                return jsonify({'message': 'No such book exists!'})
+            return jsonify(books)
+    
 
 # update book
 @app.route('/updatebook', methods=['PUT'])

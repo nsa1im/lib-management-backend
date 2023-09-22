@@ -1,5 +1,8 @@
 # lib-management-backend
 This is the backend of the library management system that is used by the librarian to do CRUD operations on books and members as well as issue and return a book.
+#
+### Use Case Diagram
+![Use Case Diagram](https://github.com/nsa1im/lib-management-backend/blob/main/usecase.png)
 
 ## 1. Set up the project as follows:
 Clone the repository to your local machine
