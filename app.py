@@ -68,20 +68,28 @@ def get_book():
 # update book
 @app.route('/updatebook', methods=['PUT'])
 def update_book():
-    for book in books:
-        if(book['isbn']==request.form['isbn']):
-            book['quantity']=request.form['quantity']
+    quantity = request.form['quantity']
+    isbn = request.form['isbn']
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_BOOK, (isbn, ))
+            if(cursor.fetchall()==[]):
+                return jsonify({'message': 'No such book exists!'})
+            cursor.execute(UPDATE_BOOK, (quantity, isbn))
             return jsonify({'message': 'Book has been updated successfully!'})
-    return jsonify({'message': 'No such book exists!'})
-
+    
 # delete book 
 @app.route('/deletebook', methods=['DELETE'])
 def delete_book():
-    for book in books:
-        if(book['isbn']==request.form['isbn']):
-            books.remove(book)
-            return jsonify({'message': 'Book has been deleted successfully!'})
-    return jsonify({'message': 'No such book exists!'})
+    isbn = request.form['isbn']
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_BOOK, (isbn, ))
+            if(cursor.fetchall()==[]):
+                return jsonify({'message': 'No such book exists!'})
+            else:
+                cursor.execute(DELETE_BOOK, (isbn, ))
+                return jsonify({'message': 'Book has been deleted successfully!'})
 
 # MEMBERS
 # create member

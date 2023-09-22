@@ -23,3 +23,9 @@ GET_ALL_BOOKS = "SELECT * FROM books;"
 GET_BOOK = "SELECT * FROM books WHERE isbn = (%s);"
 GET_BOOK_AUTHOR = "SELECT * FROM books WHERE book_author = (%s);"
 GET_BOOK_TITLE = "SELECT * FROM books WHERE book_title = (%s);"
+
+# update tables
+UPDATE_BOOK = "UPDATE books SET quantity=(%s) WHERE isbn=(%s);"
+
+# delete from tables
+DELETE_BOOK = "DELETE FROM books WHERE isbn=(%s);"
