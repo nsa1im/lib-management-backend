@@ -5,6 +5,7 @@ distlib
 filelock
 Flask
 Flask-Cors
+gunicorn
 itsdangerous
 Jinja2
 MarkupSafe
