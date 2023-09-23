@@ -1,6 +1,6 @@
 # lib-management-backend
 This is the backend of the library management system that is used by the librarian to do CRUD operations on books and members as well as issue and return a book.
-#
+You can interact with the backend through Postman or Thunder Client. The backend is live and one can even view all the books through [this link.](https://lib-management-backend.onrender.com/allbooks)
 ### Use Case Diagram
 ![Use Case Diagram](https://github.com/nsa1im/lib-management-backend/blob/main/usecase.png)
 
