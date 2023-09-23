@@ -158,6 +158,7 @@ def issue():
     date = request.form['date']
     with connection:
         with connection.cursor() as cursor:
+            cursor.execute(CREATE_BOOK_ASSIGN)
             cursor.execute(GET_MEMBER, (member_id, ))
             if(cursor.fetchall()==[]):
                 return jsonify({'message': 'No such member was found!'})
@@ -169,6 +170,7 @@ def issue():
                     cursor.execute(GET_ASSIGN, (isbn, member_id))
                     if(cursor.fetchall()==[]):
                         cursor.execute(INSERT_ASSIGN, (isbn, member_id, date))
+                        cursor.execute(CREATE_BOOK_RETURN)
                         cursor.execute(DELETE_RETURN, (isbn, member_id))
                         return jsonify({'message': 'Book issued successfully!'})
                     else:
@@ -182,13 +184,16 @@ def returnbook():
     date = request.form['date']
     with connection:
         with connection.cursor() as cursor:
+            cursor.execute(CREATE_BOOK_RETURN)
             cursor.execute(GET_ASSIGN, (isbn, member_id))
-            if(cursor.fetchall()==[]):
+            all_assign = cursor.fetchall()
+            if(all_assign==[]):
                 return jsonify({'message': 'No such issue was found!'})
             else:
-                prev_date = cursor.fetchall()[0][2]
+                prev_date = all_assign[0][2]
                 days, fee = get_days(date, prev_date)
                 cursor.execute(INSERT_RETURN, (isbn, member_id, date, days, fee))
+                cursor.execute(CREATE_BOOK_ASSIGN)
                 cursor.execute(DELETE_ASSIGN, (isbn, member_id))
                 return jsonify({'message': 'Book return was issued!'})
 
