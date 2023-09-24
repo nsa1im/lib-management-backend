@@ -21,10 +21,10 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 # create book
 @app.route('/addbook', methods=['POST'])
 def add_book():
-    book_title = request.form['title']
-    book_author = request.form['author'] 
-    book_isbn = request.form['isbn']
-    book_quantity = request.form['quantity']
+    book_title = request.get_json()['title']
+    book_author = request.get_json()['author'] 
+    book_isbn = request.get_json()['isbn']
+    book_quantity = request.get_json()['quantity']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(CREATE_BOOKS_TABLE)
@@ -46,8 +46,8 @@ def get_books():
 # view a book based on author or title
 @app.route('/getbook', methods=['GET'])
 def get_book():
-    book_author = request.form['author']
-    book_title = request.form['title']
+    book_author = request.get_json()['author']
+    book_title = request.get_json()['title']
     books = []
     with connection:
         with connection.cursor() as cursor:
@@ -61,8 +61,8 @@ def get_book():
 # update book
 @app.route('/updatebook', methods=['PUT'])
 def update_book():
-    quantity = request.form['quantity']
-    isbn = request.form['isbn']
+    quantity = request.get_json()['quantity']
+    isbn = request.get_json()['isbn']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(GET_BOOK, (isbn, ))
@@ -74,7 +74,7 @@ def update_book():
 # delete book 
 @app.route('/deletebook', methods=['DELETE'])
 def delete_book():
-    isbn = request.form['isbn']
+    isbn = request.get_json()['isbn']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(GET_BOOK, (isbn, ))
@@ -88,9 +88,9 @@ def delete_book():
 # create member
 @app.route('/addmember', methods=['POST'])
 def add_member():
-    member_id = request.form['member_id']
-    first_name = request.form['first_name']
-    last_name = request.form['last_name']
+    member_id = request.get_json()['member_id']
+    first_name = request.get_json()['first_name']
+    last_name = request.get_json()['last_name']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(CREATE_MEMBERS_TABLE)
@@ -112,8 +112,8 @@ def get_members():
 # view a member based on name
 @app.route('/getmember', methods=['GET'])
 def get_member():
-    first_name = request.form['first_name']
-    last_name = request.form['last_name']
+    first_name = request.get_json()['first_name']
+    last_name = request.get_json()['last_name']
     members = []
     with connection:
         with connection.cursor() as cursor:
@@ -126,9 +126,9 @@ def get_member():
 # update member
 @app.route('/updatemember', methods=['PUT'])
 def update_member():
-    member_id = request.form['member_id']
-    first_name =request.form['first_name']
-    last_name =request.form['last_name']
+    member_id = request.get_json()['member_id']
+    first_name =request.get_json()['first_name']
+    last_name =request.get_json()['last_name']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(GET_MEMBER, (member_id, ))
@@ -140,7 +140,7 @@ def update_member():
 # delete member 
 @app.route('/deletemember', methods=['DELETE'])
 def delete_member():
-    member_id = request.form['member_id']
+    member_id = request.get_json()['member_id']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(GET_MEMBER, (member_id, ))
@@ -153,9 +153,9 @@ def delete_member():
 # issue book
 @app.route('/issue', methods=['POST'])
 def issue():
-    member_id = request.form['member_id']
-    isbn = request.form['isbn']
-    date = request.form['date']
+    member_id = request.get_json()['member_id']
+    isbn = request.get_json()['isbn']
+    date = request.get_json()['date']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(CREATE_BOOK_ASSIGN)
@@ -179,9 +179,9 @@ def issue():
 # issue book return
 @app.route('/returnbook', methods=['POST'])
 def returnbook():
-    isbn = request.form['isbn']
-    member_id = request.form['member_id']
-    date = request.form['date']
+    isbn = request.get_json()['isbn']
+    member_id = request.get_json()['member_id']
+    date = request.get_json()['date']
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(CREATE_BOOK_RETURN)
