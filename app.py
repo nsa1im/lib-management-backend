@@ -72,9 +72,8 @@ def update_book():
             return jsonify({'message': 'Book has been updated successfully!'})
     
 # delete book 
-@app.route('/deletebook', methods=['DELETE'])
-def delete_book():
-    isbn = request.get_json()['isbn']
+@app.route('/deletebook/<int:isbn>', methods=['DELETE'])
+def delete_book(isbn):
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(GET_BOOK, (isbn, ))
@@ -138,9 +137,8 @@ def update_member():
             return jsonify({'message': 'Member has been updated successfully!'})
 
 # delete member 
-@app.route('/deletemember', methods=['DELETE'])
-def delete_member():
-    member_id = request.get_json()['member_id']
+@app.route('/deletemember/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(GET_MEMBER, (member_id, ))
