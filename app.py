@@ -195,5 +195,23 @@ def returnbook():
                 cursor.execute(DELETE_ASSIGN, (isbn, member_id))
                 return jsonify({'message': 'Book return was issued!'})
 
+# view all issues
+@app.route('/allissues', methods=['GET'])
+def get_issues():
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ALL_ISSUES)
+            books = cursor.fetchall()
+            return jsonify(books)
+
+# view all returns
+@app.route('/allreturns', methods=['GET'])
+def get_returns():
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ALL_RETURNS)
+            books = cursor.fetchall()
+            return jsonify(books)
+
 if __name__ == '__main__':
     app.run()
