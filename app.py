@@ -46,8 +46,8 @@ def get_books():
 # view a book based on author or title
 @app.route('/getbook', methods=['GET'])
 def get_book():
-    book_author = request.get_json()['author']
-    book_title = request.get_json()['title']
+    book_author = request.args.get('author')
+    book_title = request.args.get('title')
     books = []
     with connection:
         with connection.cursor() as cursor:
@@ -112,8 +112,8 @@ def get_members():
 # view a member based on name
 @app.route('/getmember', methods=['GET'])
 def get_member():
-    first_name = request.get_json()['first_name']
-    last_name = request.get_json()['last_name']
+    first_name = request.args.get('first_name')
+    last_name = request.args.get('last_name')
     members = []
     with connection:
         with connection.cursor() as cursor:
