@@ -29,6 +29,9 @@ GET_NAME = "SELECT * FROM members WHERE first_name=(%s) OR last_name=(%s);"
 
 GET_ASSIGN = "SELECT * FROM bookassign WHERE isbn=(%s) AND member_id=(%s);"
 
+GET_ALL_ISSUES = "SELECT * FROM bookassign;"
+GET_ALL_RETURNS = "SELECT * FROM bookreturn;"
+
 # update tables
 UPDATE_BOOK = "UPDATE books SET quantity=(%s) WHERE isbn=(%s);"
 UPDATE_MEMBER = "UPDATE members SET first_name=(%s), last_name=(%s) WHERE member_id=(%s);"
