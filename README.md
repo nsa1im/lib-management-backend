@@ -4,6 +4,9 @@ You can interact with the backend through Postman or Thunder Client. The backend
 ### Use Case Diagram
 ![Use Case Diagram](https://github.com/nsa1im/lib-management-backend/blob/main/usecase.png)
 
+## Database Schema
+![DatabaseSchema](https://github.com/nsa1im/lib-management-backend/blob/main/databaseSchema.png)
+
 ## 1. Set up the project as follows:
 Clone the repository to your local machine
 #
